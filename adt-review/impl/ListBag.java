@@ -78,12 +78,14 @@ public class ListBag<E> implements Bag<E> {
      */
     public void remove(E item) {
     	int i = 0;
-        for(Iterator<E> it = internal.iterator(); it.hasNext();){
-        	if(it.next().equals(item)){
-        		internal.remove(i);
-        	}
-        	i++;
-        }
+    	while(i<internal.size()){
+    		if(internal.get(i) == null) continue;
+    		if(internal.get(i).equals(item)){
+    			internal.remove(i);
+    		}else{
+    			i++;
+    		}
+    	}
     }
 
     /**

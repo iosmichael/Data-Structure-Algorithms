@@ -77,7 +77,7 @@ public class BitVecNSet implements NSet {
      */	
     public boolean contains(Integer item) {
         checkIndex(item);
-        throw new UnsupportedOperationException();
+        return (internal[item / 8] & 1 << (item % 8)) != 0;
     }
 
     /**
@@ -87,7 +87,9 @@ public class BitVecNSet implements NSet {
      */	
     public void remove(Integer item) {
         checkIndex(item);
-        throw new UnsupportedOperationException();
+        if(contains(item)){
+        	internal[item / 8] ^= 1 << (item % 8);
+        }
     }
 
 
@@ -96,7 +98,7 @@ public class BitVecNSet implements NSet {
      * @return True if the set is empty, false otherwise.
      */
     public boolean isEmpty() {
-        throw new UnsupportedOperationException();
+        return size() == 0;
     }
 
 
@@ -142,7 +144,26 @@ public class BitVecNSet implements NSet {
      * in either this or the other set.
      */
     public NSet union(NSet other) {
-        throw new UnsupportedOperationException();
+    	BitVecNSet otherSet = (BitVecNSet) other;
+    	int otherSize = other.range() / 8 + 1;
+    	int thisSize = this.range() / 8 + 1;
+    	boolean compare = (otherSize > thisSize);
+    	int min = compare ? thisSize : otherSize;
+    	int max = compare ? otherSize : thisSize;
+    	int newRange = (other.range() > this.range()) ? other.range() : this.range();
+    	BitVecNSet toReturn = new BitVecNSet(newRange);
+    	for(int i = 0; i < max; i++){
+    		if(i < min){
+    			toReturn.internal[i] = (byte)(this.internal[i] | otherSet.internal[i]);
+    		}else{
+    			if(compare){
+    				toReturn.internal[i] = (byte)(otherSet.internal[i]);
+    			}else{
+    				toReturn.internal[i] = (byte)(this.internal[i]);
+    			}
+    		}
+    	}
+    	return toReturn;
     }
 
     /**
@@ -153,7 +174,16 @@ public class BitVecNSet implements NSet {
      * in both this and the other set.
      */
     public NSet intersection(NSet other) {
-        throw new UnsupportedOperationException();
+    	BitVecNSet otherSet = (BitVecNSet) other;
+    	int otherSize = other.range() / 8 + 1;
+    	int thisSize = this.range() / 8 + 1;
+    	int min = (otherSize > thisSize) ? thisSize : otherSize;
+    	int newRange = (other.range() > this.range()) ? this.range() : other.range();
+    	BitVecNSet toReturn = new BitVecNSet(newRange);
+    	for(int i = 0; i < min; i++){
+    		toReturn.internal[i] = (byte)(this.internal[i] & otherSet.internal[i]);
+    	}
+    	return toReturn;
     }
 
     /**
@@ -165,7 +195,16 @@ public class BitVecNSet implements NSet {
      * are in this set but not in the other set.
      */
     public NSet difference(NSet other) {
-        throw new UnsupportedOperationException();
+    	BitVecNSet otherSet = (BitVecNSet) other;
+    	BitVecNSet toReturn = new BitVecNSet(this.range());
+    	for(int i = 0; i < this.range() / 8 + 1; i++){
+    		if(i <= other.range() / 8 + 1){
+    			toReturn.internal[i] = (byte)((this.internal[i] ^ otherSet.internal[i]) & this.internal[i]);
+    		}else{
+    			toReturn.internal[i] = (byte)(this.internal[i]);
+    		}
+    	}
+    	return toReturn;
     }
 
 
@@ -174,14 +213,68 @@ public class BitVecNSet implements NSet {
      * @return The number of items.
      */
     public int size() {
-        throw new UnsupportedOperationException();
+        int Byte = 0;
+        int Bit = 0;
+        int count = 0;
+        while(Byte < internal.length){
+        	while(Bit < 8){
+        		if(((1 << Bit) & internal[Byte]) != 0) count++;
+        		Bit++;
+        	}
+        	Bit = 0;
+        	Byte ++;
+        }
+        return count;
     }
 
     /**
      * Iterate through this set.
      */
     public Iterator<Integer> iterator() {
-        throw new UnsupportedOperationException();
+    	int Byte = 0;
+    	int Bit = 0;
+    	for(int i = 0; i<internal.length; i++){
+    		if(internal[i]!=0){ 
+    			Byte = i;
+    			break;
+    		}
+    	}
+    	for(int m = 0; m<8; m++){
+    		if(((1 << m) & internal[Byte])!=0){ 
+    			Bit = m;
+    			break;
+    		}
+    	}
+    	
+    	final int initialByte = Byte;
+    	final int initialBit = Bit;
+        return new Iterator<Integer>(){
+        	int bytePos = initialByte;
+        	int bitPos = initialBit;
+			public boolean hasNext() {
+				if(bytePos < internal.length){
+					return (internal[bytePos] & (1<<bitPos))!=0;
+				}
+				return false;
+			}
+
+			public Integer next() {
+				int oldByte = bytePos;
+				int oldBit = bitPos;
+				bitPos++;
+				while(bytePos < internal.length){
+					while(bitPos < 8){
+						if((1 << bitPos & internal[bytePos])!=0) return 8 * oldByte + oldBit;
+						bitPos ++;
+					}
+					bitPos = 0;
+					bytePos++;
+				}
+				// TODO Auto-generated method stub
+				return 8 * oldByte + oldBit;
+			}
+        	
+        };
     }
 
     public String toString() {

@@ -41,6 +41,16 @@ public class OptimizedDijkstraSSSP implements SSSP {
                 new OptimizedHeapPriorityQueue<HPAVertexRecord>(distanceBounds, new HPAVertexRecord.VRComparator());
         
         // add code here in part 5
+        while(!pq.isEmpty()){
+        	HPAVertexRecord u = pq.extractMax();
+        	for(int v :g.adjacents(u.id)){
+        		if(distanceBounds[v].getDistance() > distanceBounds[u.id].getDistance() + g.weight(u.id, v)){
+        			distanceBounds[v].setDistance(distanceBounds[u.id].getDistance() + g.weight(u.id, v));
+        			parents[v] = u.id;
+        			pq.increaseKey(distanceBounds[v]);
+        		}
+        	}
+        }
         
         Set<WeightedEdge> treeEdges = new BasicHashSet<WeightedEdge>(g.numVertices());
         

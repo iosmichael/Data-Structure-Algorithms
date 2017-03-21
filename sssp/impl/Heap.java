@@ -61,7 +61,21 @@ public abstract class Heap<E> {
      * POSTCONDITION: The subtree rooted at i is a heap.
      */
     protected void heapify(int i) {
-       throw new UnsupportedOperationException();
+    	if(i < 0 || i >= heapSize) return;
+    	if(left(i) >= heapSize && right(i) >= heapSize) return;
+    	E parent, leftChild, rightChild;
+    	parent = internal[i];
+    	leftChild = left(i) >= heapSize ? parent : internal[left(i)];
+    	rightChild = right(i) >= heapSize ? parent: internal[right(i)];
+    	if(compy.compare(parent, leftChild) < 0 && compy.compare(leftChild, rightChild) > 0){
+    		internal[left(i)] = parent;
+    		internal[i] = leftChild;
+    	}else if(compy.compare(parent, rightChild) < 0){
+    		internal[right(i)] = parent;
+    		internal[i] = rightChild;
+    	}
+    	if(left(i) < heapSize) heapify(left(i));
+    	if(right(i) < heapSize) heapify(right(i));
     }
 
 }

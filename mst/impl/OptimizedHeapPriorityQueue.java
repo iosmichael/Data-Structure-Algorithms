@@ -109,7 +109,21 @@ public class OptimizedHeapPriorityQueue<E extends HeapPositionAware> implements 
      * POSTCONDITION: The subtree rooted at i is a heap.
      */
     protected void heapify(int i) {
-        throw new UnsupportedOperationException();
+    	if(i < 0 || i >= heapSize) return;
+    	if(left(i) >= heapSize && right(i) >= heapSize) return;
+    	E parent, leftChild, rightChild;
+    	parent = internal[i];
+    	leftChild = left(i) >= heapSize ? parent : internal[left(i)];
+    	rightChild = right(i) >= heapSize ? parent: internal[right(i)];
+    	if(compy.compare(parent, leftChild) < 0 && compy.compare(leftChild, rightChild) > 0){
+    		this.set(left(i),parent);
+    		this.set(i, leftChild);
+    	}else if(compy.compare(parent, rightChild) < 0){
+    		this.set(right(i), parent);
+    		this.set(i, rightChild);
+    	}
+    	if(left(i) < heapSize) heapify(left(i));
+    	if(right(i) < heapSize) heapify(right(i));
     }
     
     /**
@@ -135,7 +149,11 @@ public class OptimizedHeapPriorityQueue<E extends HeapPositionAware> implements 
      * @param x The item to insert.
      */
     public void insert(E x) {
-        throw new UnsupportedOperationException();
+    	if(isFull()) return;
+    	this.set(heapSize, x);
+        heapSize++;
+        for (int i = heapSize - 1; i >= 0; i--)
+            heapify(i);
     }
 
     /**
@@ -152,11 +170,13 @@ public class OptimizedHeapPriorityQueue<E extends HeapPositionAware> implements 
      * @return The maximum element.
      */
     public E extractMax() {
-
+    	if(isEmpty()) return null;
         E toReturn = internal[0];
-
-        // add code in part 6
-        
+        internal[heapSize-1].setPosition(0);
+        internal[0] = internal[heapSize-1];
+        heapSize--;
+        heapify(0);
+        // Add code to remove key and fix up heap
         return toReturn;
     }
 

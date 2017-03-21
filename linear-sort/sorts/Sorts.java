@@ -43,38 +43,42 @@ public class Sorts {
         	//array value at certain index is the count
         	counts[n]++;
         }
+        printArray(counts,"counts");
         
         // The initial places for each value (once we calculate them)
         int[] nextPlace = new int[maxVal+1];
         // C. Determine the initial next place for each value
-        nextPlace[0] = 0;
-        int offset = 0;
-        for(int i = 0; i<counts.length; i++){
-        	nextPlace[i] = offset; 
-        	offset = offset + counts[i];
+        nextPlace[0] = counts[0];
+        for(int i = 1; i<counts.length; i++){
+        	nextPlace[i] = nextPlace[i-1] + counts[i];
         }
-        
+        printArray(nextPlace,"nextPlace");
         // The auxiliary array into which to sort the array
         T[] aux = (T[]) new Object[array.length];
         // D. Sort the items into aux
-        // ...
-        for(int i = 0; i<aux.length; i++){
+        //This is very important!!!!!! have to be backward sorting!!!
+        for(int i = array.length - 1; i>=0; i--){
         	int item = toInt.v(array[i]);
-        	int in = nextPlace[item];
-        	int out;
-        	if (item == maxVal){
-        		out = aux.length;
-        	}else{
-        		out = nextPlace[item+1];
-        	}
-        	for(int n = in; n<out; n++){
-        		aux[n] = array[i];
-        	}
+        	int in = --nextPlace[item];
+        	aux[in] = array[i];
         }
+
         // E. move them back to array
+        String finOutput= "final: [";
         for(int i = 0; i<array.length; i++){
         	array[i] = aux[i];
+        	finOutput += (array[i].toString()) + ", ";
         }
+        System.out.println(finOutput + "]");
+    }
+    
+    private static void printArray(int[] array, String title){
+    	String output= title+": [";
+    	for(int i = 0; i < array.length; i++){
+    		output += array[i]+", ";
+    	}
+    	output += "]";
+    	System.out.println(output);
     }
 
     /**
@@ -103,8 +107,7 @@ public class Sorts {
             final int rp = rPow;
             countingSort(array, new ToInteger<Integer>() {
                 public int v(Integer item) {
-                    // ...
-                    return (item / rp)%r;
+                    return (int)(item / rp) % r;
                 }
             });
             rPow *= r;

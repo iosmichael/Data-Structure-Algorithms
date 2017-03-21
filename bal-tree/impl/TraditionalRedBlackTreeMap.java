@@ -53,33 +53,12 @@ public class TraditionalRedBlackTreeMap<K extends Comparable<K>, V> extends
          * satisfying the constraints.
          */
         protected RBNode<K, V> fixup() {
-        	RBNode<K, V> left = this.left;
-        	RBNode<K, V> right = this.right;
-        	RBNode<K, V> replace = this;
-        	if(right.isRed() && left.isRed()){
-        		replace = this.RCL();
-        	}
-        	if(!right.isNull() && right.isRed()){
-        		RBNode<K, V> rr = right.right();
-        		RBNode<K, V> ll = right.left();
-        		if(!rr.isNull() && rr.isRed()){
-        			replace = this.rotateLeft();
-        		}
-        		if(!ll.isNull() && ll.isRed()){
-        			replace = this.RL();
-        		}
-        	}
-        	if(!left.isNull() && left.isRed()){
-        		RBNode<K, V> rr = right.right();
-        		RBNode<K, V> ll = right.left();
-        		if(!rr.isNull() && rr.isRed()){
-        			replace = this.rotateRight();
-        		}
-        		if(!ll.isNull() && ll.isRed()){
-        			replace = this.LR();
-        		}
-        	}
-            return replace;
+
+            // Write this in the Traditional RB Tree project
+        	
+        	//Four cases: RR, RL, LL, LR, RCL
+
+            return this;
         }
 
         
@@ -91,92 +70,79 @@ public class TraditionalRedBlackTreeMap<K extends Comparable<K>, V> extends
         /**
          * Rotate this tree to the left.
          * @return The node that is newly the root
-         * Left Rotation
-         * a (b)            b (b)
+         * a (b)            b(r)
          *  \              / \
-         *   b (r)   =>   a(r)c(r)
-         *    \          
-         *     c (r)
+         *   b (r)     => a(b)c(b)
+         *    \
+         *     c  (r)
          */
         private RBNode<K, V> rotateLeft() {
-        	AbstractRBRealNode b = (AbstractRBRealNode) this.right();
-            this.right = b.left();
-            b.left = this;
-            b.left.redden();  // redden a
-            b.blacken();  // blacken b
-        	return b;
+        	TradRBRealNode b = (TradRBRealNode) this.right;
+        	this.right = b.left();
+        	b.left = this;
+        	b.right.blacken();
+            return b;
         }
         
         /**
          * Rotate this tree to the right.
          * @return The node that is newly the root
-         * Right Rotation
-         *     c (b)        b (b)
-         *    /            / \
-         *   b (r)   =>   a(r)c(r)
-         *  /          
-         * a (r)
+         *    c (b)          b (r)
+         *   /              / \
+         *  b (r)     =>   a(b)c(b)
+         * /
+         *a  (r)
          */
         private RBNode<K, V> rotateRight() {
-        	AbstractRBRealNode b = (AbstractRBRealNode) this.left();
-            this.left = b.right();
-            b.left = this;
-            b.right.redden();  // redden c
-            b.blacken();     // blacken b
-        	return b;
+        	TradRBRealNode b = (TradRBRealNode)this.left;
+        	this.left = b.right();
+        	b.right = this;
+        	b.left.blacken();
+            return b;
         }
         
         /**
          * Right-Left Rotation / Double Right Rotation
-         * a        a            b
-         *  \        \          / \
-         *   c   =>   b   =>   a   c
-         *  /          \ 
-         * b            c
-         * @return newChild
+         * a(b)        a(b)            b(r)
+         *  \           \             / \
+         *   c(r)   =>   b(r)   =>   a(b)c(b)
+         *  /             \ 
+         * b(r)            c(r)
          */
-        private RBNode<K, V> RL(){
-           TradRBRealNode c = (TradRBRealNode) this.right;
-     	   //single left rotation
-           TradRBRealNode b = (TradRBRealNode) c.rotateRight();
-     	   this.right = b.left;
-     	   b.left = this;
-     	   this.redden();  // redden a
-     	   b.blacken();  // blacken b
-     	   return b;
+        private RBNode<K, V> RL() {
+        	TradRBRealNode c = (TradRBRealNode)this.right;
+        	TradRBRealNode b = (TradRBRealNode)c.rotateRight();
+        	
+        	return b;
         }
         
         /**
          * Left-Right Rotation / Double Left Rotation
-         *   c           c        b
-         *  /           /        / \
-         * a      =>   b    =>  a   c
-         *  \         /  
-         *   b       a
-         * @return newChild
+         *   c(b)           c(b)        b(r)
+         *  /              /           / \
+         * a(r)      =>   b(r)    =>  a(b)c(b)
+         *  \            /  
+         *   b(r)       a(r)
          */
-        private RBNode<K, V> LR(){
-     	   TradRBRealNode a = (TradRBRealNode) this.left;
-     	   //Single right rotation
-     	   TradRBRealNode b = (TradRBRealNode) a.rotateLeft();
-     	   this.left = b.right;
-     	   b.right = this;
-     	   this.redden();  // redden c
-     	   b.blacken();    // blacken b
-     	   return b;
+        private RBNode<K, V> LR() {
+        	return null;
         }
+        
         /**
-         * Red Uncle Case / Re-Color (No Rotation)
-         *    b
-         *   / \
-         *  a   c
+         * Rotate this tree to the right.
+         * @return The node that is newly the root
+         *    c (b)           c (r)
+         *   /  \            / \
+         *  b (r)d(r) =>   b(b)d(b)
+         * /              /
+         *a  (r)         a(r)
          */
-        private RBNode<K,V> RCL(){
-        	RBNode<K,V> a = this.left;
-        	RBNode<K,V> c = this.right;
-        	this.redden();   // redden b
-        	a.blacken();   // blacken a
-        	c.blacken();   // blacken c
+        private RBNode<K, V> recolor(){
+        	TradRBRealNode b = (TradRBRealNode)this.left;
+        	TradRBRealNode d = (TradRBRealNode)this.right;
+        	this.redden();
+        	b.blacken();
+        	d.blacken();
         	return this;
         }
 

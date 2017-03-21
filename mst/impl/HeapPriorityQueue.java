@@ -125,7 +125,11 @@ public class HeapPriorityQueue<E> extends Heap<E> implements PriorityQueue<E> {
      * @param x The item to insert.
      */
     public void insert(E x) {
-        throw new UnsupportedOperationException();
+    	 if(isFull()) return;
+         internal[heapSize] = x;
+         heapSize++;
+         for (int i = heapSize - 1; i >= 0; i--)
+             heapify(i);
     }
 
     /**
@@ -142,11 +146,12 @@ public class HeapPriorityQueue<E> extends Heap<E> implements PriorityQueue<E> {
      * @return The maximum element.
      */
     public E extractMax() {
-
+    	if(isEmpty()) return null;
         E toReturn = internal[0];
-
+        internal[0] = internal[heapSize-1];
+        heapSize--;
+        heapify(0);
         // Add code to remove key and fix up heap
-        
         return toReturn;
     }
 

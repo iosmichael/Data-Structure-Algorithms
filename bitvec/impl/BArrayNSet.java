@@ -116,7 +116,7 @@ public class BArrayNSet implements NSet {
     public NSet complement() {
         BArrayNSet toReturn = new BArrayNSet(internal.length);
         for (int i = 0; i < internal.length; i++)
-            toReturn.internal[i] = ! internal[i];
+            toReturn.internal[i] = !internal[i];
         return toReturn;
     }
 
@@ -142,9 +142,20 @@ public class BArrayNSet implements NSet {
     public NSet union(NSet other) {
         checkParameter(other);
         BArrayNSet otherSet = (BArrayNSet) other;
-        BArrayNSet toReturn = new BArrayNSet(internal.length);
-        for(int i = 0; i<internal.length;i++){
-        	toReturn.internal[i] = otherSet.internal[i] || internal[i];
+        boolean compare = otherSet.range() > this.range();
+        int min = compare ? this.range() : otherSet.range();
+        int max = compare ? otherSet.range() : this.range();
+        BArrayNSet toReturn = new BArrayNSet(max);
+        for(int i = 0; i<max;i++){
+        	if(i<min){
+        		toReturn.internal[i] = otherSet.internal[i] || internal[i];
+        	}else{
+        		if(compare){
+        			toReturn.internal[i] = otherSet.internal[i];
+        		}else{
+        			toReturn.internal[i] = this.internal[i];
+        		}
+        	}
         }
         return toReturn;
     }
@@ -159,11 +170,24 @@ public class BArrayNSet implements NSet {
     public NSet intersection(NSet other) {
         checkParameter(other);
         BArrayNSet otherSet = (BArrayNSet) other;
-        BArrayNSet toReturn = new BArrayNSet(internal.length);
-        for(int i = 0; i<internal.length;i++){
-        	toReturn.internal[i] = otherSet.internal[i] && internal[i];
+        boolean compare = otherSet.range() > this.range();
+        int min = compare ? this.range() : otherSet.range();
+        BArrayNSet toReturn = new BArrayNSet(min);
+        //System.out.println("intersection: this: "+printNSet(this));
+        //System.out.println("intersection: other: "+printNSet(otherSet));
+        for(int i = 0; i<min;i++){
+        	toReturn.internal[i] = otherSet.internal[i] && this.internal[i];
         }
+        //System.out.println("intersection: return: "+printNSet(toReturn));
         return toReturn;
+    }
+    
+    private String printNSet(BArrayNSet set){
+    	String toReturn = "";
+    	for(int i = 0; i<set.range(); i++){
+    		toReturn = toReturn + set.internal[i]+", ";
+    	}
+    	return toReturn;
     }
 
     /**
@@ -178,11 +202,20 @@ public class BArrayNSet implements NSet {
         checkParameter(other);
         BArrayNSet otherSet = (BArrayNSet) other;
         BArrayNSet toReturn = new BArrayNSet(internal.length);
-        for(int i = 0; i< internal.length;i++){
-        	toReturn.internal[i] = otherSet.internal[i] ^ internal[i];
+        boolean compare = otherSet.range() > this.range();
+        for(int i = 0; i<internal.length;i++){
+        	if(internal[i]){
+        		if (i < otherSet.range()){
+        			toReturn.internal[i] = otherSet.internal[i] ^ this.internal[i];	
+        		}else{
+        			toReturn.internal[i] = true;
+        		}
+        	}
         }
+        System.out.println("difference: return: "+printNSet(this));
+        System.out.println("difference: return: "+printNSet(otherSet));
+        System.out.println("difference: return: "+printNSet(toReturn));
         return toReturn;
-
     }
 
     /**
@@ -196,7 +229,6 @@ public class BArrayNSet implements NSet {
         int j = 0;
         while (j < internal.length && !internal[j]) j++;
         final int finalJ = j;
-        
         return new Iterator<Integer>(){
         	int pos = finalJ;
         	int count = 0;
@@ -206,8 +238,11 @@ public class BArrayNSet implements NSet {
 
 			public Integer next() {
 				int toReturn = pos;
+				pos++;
 				while (pos < internal.length && !internal[pos]) pos++;
 				count++;
+				System.out.println("toReturn: "+toReturn);
+				System.out.println("count: "+ count + " size: "+size());
 				return toReturn;
 			}
         	
