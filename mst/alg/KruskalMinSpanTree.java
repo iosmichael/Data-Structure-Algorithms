@@ -18,7 +18,7 @@ import java.util.Comparator;
  * Implementation of Kruskal's algorithm for computing
  * the minimum spanning tree of a graph.
  * 
- * @author Thomas VanDrunen
+ * @author Thomas VanDrunen, Michael Liu
  * CSCI 345, Wheaton College
  * June 23, 2015
  */
@@ -38,8 +38,7 @@ public class KruskalMinSpanTree implements MinSpanTree {
                     }
                 });
         DisjointSet vertexConnections = new OptimizedQuickUnionDisjointSet(g.numVertices());
-        
-        // Initialize A to 0
+       // Initialize A to 0
         // make a disjoint-set data structure with each vertex its own set sort the edges by weight
         //for each edge (u,v)
         //  if findSet(u) ≠ findSet(v)
