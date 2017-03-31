@@ -38,9 +38,9 @@ public class KruskalMinSpanTree implements MinSpanTree {
                     }
                 });
         DisjointSet vertexConnections = new OptimizedQuickUnionDisjointSet(g.numVertices());
-       // Initialize A to 0
+        // Initialize A to 0
         // make a disjoint-set data structure with each vertex its own set sort the edges by weight
-        //for each edge (u,v)
+        // for each edge (u,v)
         //  if findSet(u) ≠ findSet(v)
         //    add(u,v) to A
         //    union(u,v)

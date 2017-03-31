@@ -53,11 +53,22 @@ public class TraditionalRedBlackTreeMap<K extends Comparable<K>, V> extends
          * satisfying the constraints.
          */
         protected RBNode<K, V> fixup() {
-
-            // Write this in the Traditional RB Tree project
         	
+            // Write this in the Traditional RB Tree project
         	//Four cases: RR, RL, LL, LR, RCL
-
+        	if(this.left.isRed() && this.isRedLL()){
+        		if(this.right.isRed()) return this.recolor();
+        		return this.rotateRight();
+        	}else if(this.left.isRed() && this.isRedLR()){
+        		if(this.right.isRed()) return this.recolor();
+        		return this.LR();
+        	}else if(this.right.isRed() && this.isRedRR()){
+        		if(this.left.isRed()) return this.recolor();
+        		return this.rotateLeft();
+        	}else if(this.right.isRed() && this.isRedRL()){
+        		if(this.left.isRed()) return this.recolor();
+        		return this.RL();
+        	}
             return this;
         }
 
@@ -112,7 +123,11 @@ public class TraditionalRedBlackTreeMap<K extends Comparable<K>, V> extends
         private RBNode<K, V> RL() {
         	TradRBRealNode c = (TradRBRealNode)this.right;
         	TradRBRealNode b = (TradRBRealNode)c.rotateRight();
-        	
+        	this.right = b.left;
+        	b.left = this;
+        	c.blacken();
+        	b.redden();
+        	this.blacken();
         	return b;
         }
         
@@ -125,7 +140,14 @@ public class TraditionalRedBlackTreeMap<K extends Comparable<K>, V> extends
          *   b(r)       a(r)
          */
         private RBNode<K, V> LR() {
-        	return null;
+        	TradRBRealNode a = (TradRBRealNode)this.left;
+        	TradRBRealNode b = (TradRBRealNode)a.rotateLeft();
+        	this.left = b.right;
+        	b.right = this;
+        	a.blacken();
+        	b.redden();
+        	this.blacken();
+        	return b;
         }
         
         /**

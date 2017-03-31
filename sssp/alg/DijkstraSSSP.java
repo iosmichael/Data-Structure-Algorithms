@@ -41,7 +41,7 @@ public class DijkstraSSSP implements SSSP {
         
         // add code here in part 4
         while(!pq.isEmpty()){
-        	VertexRecord u = pq.extractMax();
+        	VertexRecord u = pq.extractMax(); 
         	for(int v :g.adjacents(u.id)){
         		if(distanceBounds[v].getDistance() > distanceBounds[u.id].getDistance() + g.weight(u.id, v)){
         			distanceBounds[v].setDistance(distanceBounds[u.id].getDistance() + g.weight(u.id, v));
